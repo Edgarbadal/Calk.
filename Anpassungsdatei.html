@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reinigungskostenrechner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        select,
+        input[type="number"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .room-item {
+            background-color: #e6e6e6;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            position: relative;
+            padding-right: 80px; /* Erhöht den rechten Padding, um Platz für den Button zu schaffen */
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px; /* Etwas mehr Abstand zum rechten Rand */
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .remove-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        #calculatorFlexibilityHint {
+            font-style: italic;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+<script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+
+
+  </head>
+  <body>
+    <h1>Reinigungskostenrechner</h1>
+    <div class="container">
+      <div class="form-control">
+        <label for="objektTyp">Objekttyp:</label>
+        <select id="objektTyp" required>
+          <option value="" disabled selected>Bitte wählen</option>
+                <option value="Sportverein">Sportverein</option>
+                <option value="Bildungseinrichtung">Bildungseinrichtung</option>
+                <option value="Kindergarten">Kindergarten</option>
+                <option value="Handelsgeschäft">Handelsgeschäft</option>
+                <option value="Wohnanlage">Wohnanlage</option>
+                <option value="Praxis">Praxis</option>
+                <option value="Kanzlei">Kanzlei</option>
+                <option value="Beherbergungsbetrieb">Beherbergungsbetrieb</option>
+                <option value="Servicestelle">Servicestelle</option>
+                <option value="Bürogebäude">Bürogebäude</option>
+                <option value="Krankenhaus">Krankenhaus</option>
+                <option value="Treppenhaus">Treppenhaus</option>
+                <option value="Sonstiges">Sonstiges</option>
+        </select>
+      </div>
+      <div class="form-control">
+        <label for="reinigungsArt">Reinigungsart:</label>
+        <select id="reinigungsArt" required>
+          <option value="" disabled selected>Bitte wählen</option>
+          <option value="Unterhaltsreinigung">Unterhaltsreinigung</option>
+          <option value="Grundreinigung">Grundreinigung</option>
+          <option value="Sonderreinigung">Sonderreinigung</option>
+          <option value="Büroreinigung">Büroreinigung</option>
+          <option value="Glasreinigung">Glasreinigung</option>
+        </select>
+      </div>
+      <div class="form-control">
+        <label for="reinigungsHaeufigkeit"
+          >Reinigungshäufigkeit (mal pro Woche):</label
+        >
+        <select id="reinigungsHaeufigkeit" required>
+          <option value="" disabled selected>Bitte wählen</option>
+          <option value="14">14 (2x täglich, 7 Tage die Woche)</option>
+          <option value="10">10 (2x täglich, 5 Tage die Woche)</option>
+          <option value="7">7 (1x täglich, 7 Tage die Woche)</option>
+          <option value="5">5 (1x täglich, 5 Tage die Woche)</option>
+          <option value="3">3 (3x wöchentlich)</option>
+          <option value="2">2 (2x wöchentlich)</option>
+          <option value="1">1 (1x wöchentlich)</option>
+          <option value="0.5">0.5 (Alle zwei Wochen)</option>
+          <option value="0.25">0.25 (Einmal im Monat)</option>
+        </select>
+      </div>
+
+      <div class="form-control">
+        <label for="roomType">Raumtyp:</label>
+        <select id="roomType">
+          <option value="Sanitärraum">Sanitärraum</option>
+          <option value="Flur/Halle">Flur/Halle</option>
+          <option value="Küche">Küche</option>
+          <option value="Büroraum">Büroraum</option>
+          <option value="Treppen">Treppen</option>
+          <option value="Zimmer">Zimmer</option>
+        </select>
+      </div>
+
+      <div class="form-control" id="roomAreaContainer">
+        <label for="roomArea">Fläche (m²):</label>
+        <input type="number" id="roomArea" placeholder="Raumfläche in m²" />
+      </div>
+
+      <div class="form-control" id="stepsContainer" style="display: none">
+        <label for="stepsCount">Anzahl der Stufen:</label>
+        <input type="number" id="stepsCount" placeholder="Anzahl der Stufen" />
+      </div>
+
+      <div class="form-control" id="roomCountContainer">
+        <label for="roomCount">Anzahl der Räume:</label>
+        <input type="number" id="roomCount" value="1" />
+      </div>
+      <div class="form-control">
+        <label for="roomName">Raumname (Optional):</label>
+        <input type="text" id="roomName" placeholder="Geben Sie einen Raumnamen ein" />
+    </div>
+      <button id="addRoomButton">Raum hinzufügen</button>
+      <div id="roomList"></div>
+
+      <div id="details">
+        <p>Gesamtkosten: <span id="totalCost">0</span> € pro Monat</p>
+        <p>Monatlich zu reinigende Fläche: <span id="totalArea">0</span> m²</p>
+      </div>
+
+      <div class="form-control">
+        <label for="email">E-Mail-Adresse für das Angebot:</label>
+        <input type="email" id="email" placeholder="Ihre E-Mail-Adresse" />
+      </div>
+
+      <button id="getOfferButton" disabled>Angebot einholen</button>
+      <button id="resetButton">Zurücksetzen</button>
+      <p id="calculatorFlexibilityHint">
+        Hinweis: Unser Reinigungskostenrechner ist flexibel und kann an Ihre spezifischen
+        Anforderungen individuell angepasst werden. Sollte es jedoch ein größeres Projekt sein, dann können Sie uns auch gerne per E-Mail kontaktieren und wir machen Ihnen selbst, ein auf Sie zugeschnittenes Angebot.
+      </p>
+    </div>
+    <script type="text/javascript">
+      (function(){
+          emailjs.init("A5fbkiWLcYFXNJ2Au"); // Ersetze 'user_xxxxxxxxxxxxxxxxxx' mit deiner User-ID von EmailJS
+      })();
+  </script>
+  
+    <script>
+      const CLEANING_PERFORMANCE_VALUES = {
+        Sanitärraum: 17,
+        "Flur/Halle": 73,
+        Küche: 30,
+        Büroraum: 110,
+        Treppen: 85, // Leistung pro Stufe
+        Zimmer: 90,
+      };
+
+      const HOURLY_RATES = {
+        Unterhaltsreinigung: 43,
+        Grundreinigung: 45,
+        Sonderreinigung: 45, // Sonderreinigung wird wie Grundreinigung berechnet
+        Büroreinigung: 43, // Büroreinigung wird wie Unterhaltsreinigung berechnet
+        Glasreinigung: 7, // 7,00 € pro m² Fläche
+      };
+
+      let rooms = [];
+
+      const addRoomButton = document.getElementById("addRoomButton");
+      const roomList = document.getElementById("roomList");
+      const totalCostSpan = document.getElementById("totalCost");
+      const totalAreaSpan = document.getElementById("totalArea");
+      const roomTypeSelect = document.getElementById("roomType");
+      const getOfferButton = document.getElementById("getOfferButton");
+      const emailInput = document.getElementById("email");
+      const roomAreaContainer = document.getElementById("roomAreaContainer");
+      const stepsContainer = document.getElementById("stepsContainer");
+      const roomCountContainer = document.getElementById("roomCountContainer");
+      const reinigungsArtSelect = document.getElementById("reinigungsArt");
+
+      reinigungsArtSelect.addEventListener("change", function () {
+        const isGlassCleaningSelected = this.value === "Glasreinigung";
+        roomTypeSelect.disabled = isGlassCleaningSelected;
+        roomCountContainer.style.display = isGlassCleaningSelected
+          ? "none"
+          : "block";
+
+        if (isGlassCleaningSelected) {
+          roomTypeSelect.value = "Glas";
+          document.getElementById("roomCount").value = "1";
+        }
+      });
+
+      roomTypeSelect.addEventListener("change", function () {
+        const isStairs = this.value === "Treppen";
+        roomAreaContainer.style.display = isStairs ? "none" : "block";
+        stepsContainer.style.display = isStairs ? "block" : "none";
+        roomCountContainer.style.display = isStairs ? "none" : "block"; // Versteckt das Feld für Treppen
+                if (isStairs) {
+                  document.getElementById("roomArea").value = "";
+                  // document.getElementById('roomCount').value = ''; Entfernt, da wir das Feld nun ausblenden
+                } else {
+                  document.getElementById("stepsCount").value = "";
+                }
+              });
+
+              function addRemoveButton(roomElement, index) {
+                const removeBtn = document.createElement("button");
+                removeBtn.textContent = "Entfernen";
+                removeBtn.className = "remove-btn";
+                removeBtn.onclick = function () {
+                  rooms.splice(index, 1); // Entfernt den Raum aus dem Array
+                  updateRoomList(); // Aktualisiert die Liste
+                  calculateTotalCostAndArea(); // Berechnet die Kosten und die Fläche neu
+                };
+                roomElement.appendChild(removeBtn);
+              }
+
+              function updateRoomList() {
+                roomList.innerHTML = "";
+                rooms.forEach((room, index) => {
+                  const roomElement = document.createElement("div");
+                  roomElement.className = "room-item";
+                  const areaLabel = room.type === "Treppen" ? "Stufen" : "m²";
+                  const roomName = room.name ? room.name : `Raum ${index + 1}`;
+                  roomElement.textContent = `${roomName}: ${room.type}, ${
+                    room.area
+                  } ${areaLabel}, Reinigungsfrequenz: ${
+                    room.cleaningFrequency
+                  }x pro Woche`;
+                  addRemoveButton(roomElement, index); // Fügt den Entfernen-Button hinzu
+                  roomList.appendChild(roomElement);
+                });
+              }
+
+              function calculateTotalCostAndArea() {
+            let totalCost = 0;
+            let totalCleaningArea = 0;
+            let totalSteps = 0;
+
+            rooms.forEach((room) => {
+                const cleaningType = document.getElementById("reinigungsArt").value;
+                
+                if (cleaningType === "Glasreinigung") {
+                    // Bei Glasreinigung wird der Preis pro m² angesetzt und mit der Fläche multipliziert
+                    const costForRoom = room.area * HOURLY_RATES[cleaningType] * room.cleaningFrequency * 4.33;
+                    totalCost += costForRoom * room.count; // Berücksichtige die Anzahl der Räume
+                    totalCleaningArea += room.area * room.count; // Berücksichtige die Anzahl der Räume für die Gesamtfläche
+                } else {
+                    // Für alle anderen Reinigungsarten
+                    totalCost += room.price * room.count; // Der Preis wurde bereits pro Raum berechnet, multipliziere mit der Anzahl
+                    if (room.type === "Treppen") {
+                        totalSteps += room.area * room.cleaningFrequency * 4; // Berücksichtige die Anzahl der Räume für die Gesamttreppen
+                    } else {
+                        totalCleaningArea += room.area * room.cleaningFrequency * 4 * room.count; // Berücksichtige die Anzahl der Räume für die Gesamtfläche
+                    }
+                }
+            });
+
+                // Aktualisiert die Anzeige der Gesamtkosten direkt
+                totalCostSpan.textContent = `${totalCost.toFixed(2)} `;
+
+                // Aktualisiert die Anzeige der gereinigten Gesamtfläche direkt
+                if (totalCleaningArea > 0) {
+                  totalAreaSpan.textContent = `${totalCleaningArea} `;
+                } else {
+                  totalAreaSpan.textContent = "0 ";
+                }
+
+                // Prüft, ob es ein Element für die Anzahl der gereinigten Treppenstufen gibt und aktualisiert es
+                let totalStepsSpan = document.getElementById("totalSteps");
+                if (!totalStepsSpan) {
+                  totalStepsSpan = document.createElement("p");
+                  totalStepsSpan.id = "totalSteps";
+                  document.querySelector("#details").appendChild(totalStepsSpan);
+                }
+
+                if (totalSteps > 0) {
+                  totalStepsSpan.textContent = `Monatlich zu reinigende Treppenstufen : ${totalSteps} Stufen`;
+                } else {
+                  totalStepsSpan.textContent = "";
+                }
+              }
+
+              function calculatePrice(
+                roomType,
+                roomArea,
+                cleaningType,
+                cleaningFrequency
+              ) {
+                const cleaningFrequencyMultiplier = parseFloat(cleaningFrequency);
+                if (roomType === "Glas") {
+                  // Für Glasreinigung wird ein fester Preis pro m² verwendet, multipliziert mit der Reinigungshäufigkeit
+                  return (
+                    roomArea *
+                    HOURLY_RATES["Glasreinigung"] *
+                    cleaningFrequencyMultiplier *
+                    4.33
+                  );
+                } else {
+                  const performance = CLEANING_PERFORMANCE_VALUES[roomType];
+                  const hourlyRate = HOURLY_RATES[cleaningType];
+                  const hoursNeeded = roomArea / performance;
+                  return hoursNeeded * hourlyRate * cleaningFrequencyMultiplier * 4.33;
+                }
+              }
+
+              addRoomButton.addEventListener("click", function () {
+            const roomType = roomTypeSelect.value;
+            const cleaningType = document.getElementById("reinigungsArt").value;
+            const cleaningFrequency =
+              parseFloat(document.getElementById("reinigungsHaeufigkeit").value) ||
+              0;
+            let roomArea =
+              parseFloat(document.getElementById("roomArea").value) || 0;
+            let stepsCount =
+              parseInt(document.getElementById("stepsCount").value, 10) || 0;
+            let roomCount =
+              parseInt(document.getElementById("roomCount").value, 10) || 1; // Lese die Anzahl der Räume
+            const roomName = document.getElementById("roomName").value.trim(); // Lese den Raumnamen
+
+            const area = roomType === "Treppen" ? stepsCount : roomArea;
+            let price = calculatePrice(
+              roomType,
+              area,
+              cleaningType,
+              cleaningFrequency
+            );
+            price = price * roomCount; // Multipliziere den Preis mit der Anzahl der Räume
+         
+            // Suche nach existierendem Raum mit den gleichen Eigenschaften
+            let existingRoomIndex = rooms.findIndex(room =>
+              room.type === roomType &&
+              room.area === area &&
+              room.cleaningFrequency === cleaningFrequency &&
+              room.name === roomName);
+
+            if (existingRoomIndex !== -1) {
+                // Aktualisiere die Anzahl und den Preis, wenn Raum gefunden wurde
+                rooms[existingRoomIndex].count += roomCount;
+                rooms[existingRoomIndex].price += price * roomCount;
+            } else {
+                // Füge neuen Raum hinzu, wenn kein passender Raum gefunden wurde
+                rooms.push({
+                    type: roomType,
+                    area: area,
+                    price: price,
+                    cleaningFrequency: cleaningFrequency,
+                    count: roomCount,  // Füge die Anzahl hinzu
+                    name: roomName  // Füge den Raumnamen hinzu
+                });
+            }
+
+            updateRoomList();
+            calculateTotalCostAndArea();
+        });
+
+        function updateRoomList() {
+            roomList.innerHTML = "";
+            rooms.forEach((room, index) => {
+                const roomElement = document.createElement("div");
+                roomElement.className = "room-item";
+                const areaLabel = room.type === "Treppen" ? "Stufen" : "m²";
+                const roomName = room.name ? room.name : `Raum ${index + 1}`;
+                let roomDescription;
+                if (room.type === "Treppen") {
+                    roomDescription = `${roomName}: ${room.type}, ${room.area} ${areaLabel}, Reinigungsfrequenz: ${room.cleaningFrequency}x pro Woche`;
+                } else {
+                    roomDescription = `${roomName}: ${room.type}, ${room.area} ${areaLabel}, Reinigungsfrequenz: ${room.cleaningFrequency}x pro Woche, Anzahl: ${room.count}`;
+                }
+
+                // Die Zuweisung von roomElement.textContent sollte außerhalb der if-else-Struktur stehen,
+                // und es sollte roomDescription verwenden, um Wiederholungen zu vermeiden und den Fehler zu beheben.
+                roomElement.textContent = roomDescription;
+                addRemoveButton(roomElement, index); // Fügt den Entfernen-Button hinzu
+                roomList.appendChild(roomElement);
+            });
+        }
+
+
+
+
+              function validateEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+              }
+
+             // Entfernt den doppelten EventListener und lässt nur den äußeren EventListener
+             document.getElementById("getOfferButton").addEventListener("click", function (event) {
+    event.preventDefault(); // Verhindere das Neuladen der Seite
+
+    const email = document.getElementById("email").value.trim();
+    if (!validateEmail(email)) {
+        alert("Bitte geben Sie eine gültige E-Mail-Adresse ein.");
+        return;
+    }
+
+    const objektTyp = document.getElementById('objektTyp').selectedOptions[0].text;
+    const reinigungsArt = document.getElementById('reinigungsArt').selectedOptions[0].text;
+
+    let emailMessage = `Objekttyp: ${objektTyp}\nReinigungsart: ${reinigungsArt}\n\nRaumdetails:\n`;
+
+    const roomsData = rooms.map(room => {
+        let roomDetails = room.name ? `Raumname: ${room.name}, ` : '';
+        roomDetails += `Raumtyp: ${room.type}, Fläche: ${room.area} m²`;
+
+        if (room.type === "Treppen" && room.stepsCount !== undefined) {
+            roomDetails += `, Anzahl der Stufen: ${room.stepsCount}`;
+        } else if (room.count !== undefined && room.count > 1) {
+            roomDetails += `, Anzahl der Räume: ${room.count}`;
+        }
+
+        roomDetails += `, Reinigungshäufigkeit: ${room.cleaningFrequency} mal pro Woche, Preis: ${room.price.toFixed(2)} €`;
+
+        return roomDetails;
+    }).join('\n');
+    emailMessage += roomsData;
+
+const totalCost = document.getElementById('totalCost').textContent;
+const totalArea = document.getElementById('totalArea').textContent;
+emailMessage += `\n\nGesamtkosten: ${totalCost} €\nGesamtfläche: ${totalArea} m²`;
+
+// emailMessage enthält jetzt den kompletten Text für die E-Mail.
+// Hier könntest du die Variable emailMessage verwenden, um den Inhalt der E-Mail zu setzen.
+
+
+
+    const emailParams = {
+        to_email: email,
+        message: `Hier ist Ihr Reinigungsangebot:\n\n${roomsData}\nGesamtkosten: ${totalCost}€\nGesamtfläche: ${totalArea}m²\n\nVielen Dank für Ihre Anfrage!`
+    };
+
+    emailjs.send('service_7nwhdt5', 'template_418ihki', emailParams)
+    .then(function(response) {
+         console.log('SUCCESS!', response.status, response.text);
+         alert('Ihre Angebotsanfrage wurde erfolgreich gesendet! Prüfen Sie ggf. Ihren Spamordner.');
+      }, function(error) {
+         console.log('FAILED...', error);
+         alert('Es gab einen Fehler beim Senden Ihrer Anfrage.');
+      });
+});           
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+            
+            // Es scheint, als wäre dieser console.log-Aufruf überflüssig, da offerData nicht verwendet wird
+            // console.log("Angebotsanfrage:", offerData); 
+      ;
+
+              const resetButton = document.getElementById("resetButton");
+              resetButton.addEventListener("click", function () {
+                rooms = [];
+                updateRoomList();
+                calculateTotalCostAndArea();
+                emailInput.value = "";
+                getOfferButton.disabled = true;
+              });
+
+              emailInput.addEventListener("input", function () {
+                const email = emailInput.value.trim();
+                getOfferButton.disabled = !validateEmail(email);
+              });
+            </script>
+          </body>
+
+        </html>
